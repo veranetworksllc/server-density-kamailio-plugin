@@ -25,7 +25,7 @@ class Kamailio (object):
     
     def run(self):
         #define the data dictionary
-        data = {'Free Shared Memory (MB)':0,'Total Shared Memory (MB)':0,'Used Shared Memory (MB)':0,'Real Used Shared Memory (MB)':0,'Max Used Shared Memory (MB)':0 }
+        data = {'Free Shared Memory (MB)':0,'Total Shared Memory (MB)':0,'Used Shared Memory (MB)':0,'Real Used Shared Memory (MB)':0,'Max Used Shared Memory (MB)':0,'In Use Transactions':0,'Active Transactions':0 }
 
         # Collecting Free Shared Memory Value
         command = 'sudo /usr/local/sbin/kamctl stats | /bin/grep \'shmem:free_size\' | /bin/sed \'s/shmem:free_size = //\''
@@ -66,6 +66,21 @@ class Kamailio (object):
         on5 = 0
         on5 = int(str(op5)) / (1024 * 1024)
         data['Max Used Shared Memory (MB)'] = on5
+
+        # Collecting In Use Transactions
+        c6 = 'sudo /usr/local/sbin/kamcmd tm.stats | /bin/grep current |  /bin/sed \'s/\W//\' | /bin/sed \'s/current: //\''
+        p6 = subprocess.Popen(c6,shell=True,stdout=subprocess.PIPE)
+        op6 = p6.communicate()[0]
+        on6 = int(str(op6))
+        data['In Use Transactions'] = on6
+
+        # Collecting Active Transactions
+        c7 = 'sudo /usr/local/sbin/kamctl stats| /bin/grep tmx:active_transactions| /bin/sed \'s/tmx:active_transactions = //\''
+        p7 = subprocess.Popen(c7,shell=True,stdout=subprocess.PIPE)
+        op7 = p7.communicate()[0]
+        on7 = int(str(op7))
+        data['Active Transactions'] = on7
+
 
         #Return the data dictionary to Server Density
         return data	
